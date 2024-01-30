@@ -1,27 +1,30 @@
 import { Controller, Get, Param, Body, Delete, Post, Patch } from '@nestjs/common';
+import { OrdersService } from './orders.service';
 
 @Controller('users/:userId/orders')
 export class OrdersController
 {
+    constructor(private readonly OrdersService: OrdersService) {}
+
     @Get()
-    retrieveAll(@Param('userId') userId:string):string {
-        return "all orders for " + userId;
+    retrieveAll(@Param('userId') userId:string):any {
+        return this.OrdersService.getAll(userId);
     }
 
     @Get(':orderId')
     retrieveOrder(
         @Param('userId') userId:string,
         @Param('orderId') orderId:string
-    ):string {
-        return `you asked the order id ${orderId}, and user id ${userId}`
+    ):any {
+        return this.OrdersService.getOne(userId, orderId);
     }
 
     @Post()
     createOrder(
         @Param('userId') userId:string,
         @Body() data:any
-    ):string {
-        return `user ${userId}, has made an order ${JSON.stringify(data)}`
+    ):any {
+        return this.OrdersService.createOrder(userId, data);
     }
 
     @Patch(':orderId')
@@ -30,7 +33,7 @@ export class OrdersController
         @Param('orderId') orderId:string,
         @Body() data:any,
     ):string {
-        return `updated the order ${orderId} for user ${userId} with ${JSON.stringify(data)}`
+        return this.OrdersService.updateOrder(userId, orderId, data);
     }
 
     @Delete(':orderId')
@@ -38,6 +41,6 @@ export class OrdersController
         @Param('userId') userId:string,
         @Param('orderId') orderId:string,
     ):string {
-        return `deleted order ${orderId} for user ${userId}`
+        return this.OrdersService.deleteOrder(userId, orderId);
     }
 }
