@@ -1,10 +1,10 @@
-import { UpdateUserDto, CreateUserDto as User } from './users.dto';
+import { ParseObjectIdPipe } from 'src/common/pipes/parseObjectId.pipe';
+import { UpdateUserDto, CreateUserDto as User } from './schemas/users.dto';
 import { UsersService } from './users.service';
 import {
     Controller, Body, Param,
-    Get, Post, Patch, Delete, 
-    HttpException, HttpStatus,
-    ParseUUIDPipe
+    Get, Post, Patch, Delete,
+    BadRequestException,
 } from '@nestjs/common';
 
 @Controller('users')
@@ -13,46 +13,52 @@ export class UsersController
     constructor(private readonly UsersService: UsersService) {}
 
     @Get()
-    retrieveAll(): User[] {
+    retrieveAll(): Promise<User[]> {
         return this.UsersService.getAll();
     }
 
     @Get(':id')
     retrieveUser(
-        @Param('id', ParseUUIDPipe) id:string
-    ): User {
-        let user = this.UsersService.getOne(id);
-        if (!user)
-            throw new HttpException("not found", HttpStatus.NOT_FOUND);
-        return user;
+        @Param('id', ParseObjectIdPipe) id:string
+    ): Promise<User> {
+        return this.UsersService.getOne(id)
     }
 
     @Post()
-    createUser(@Body() data: User): User {
-        let user = this.UsersService.create(data);
-        if (!user)
-            throw new HttpException("not found", HttpStatus.NOT_FOUND);
-        return user;
+    createUser(@Body() data: User): Promise<User> {
+        return this.UsersService.create(data)
+            .catch(() => {
+                throw new BadRequestException(
+                    {
+                        "error": "Bad Request",
+                        "message": "this email is used by another user.",
+                        "statusCode": 400
+                    }
+                )
+            });
     }
 
     @Patch(':id')
     updateUser(
-        @Param('id', ParseUUIDPipe) id:string,
+        @Param('id', ParseObjectIdPipe) id:string,
         @Body() data: UpdateUserDto
-    ): User {
-        let user = this.UsersService.update(id, data);
-        if (!user)
-            throw new HttpException("not found", HttpStatus.NOT_FOUND);
-        return user;
+    ): Promise<User> {
+        return this.UsersService.update(id, data)
+            .catch(() => {
+                throw new BadRequestException(
+                    {
+                        "error": "Bad Request",
+                        "message": "this email is used by another user.",
+                        "statusCode": 400
+                    }
+                )
+            });
     }
 
     @Delete(':id')
     deleteUser(
-        @Param('id', ParseUUIDPipe) id:string
-    ): User {
-        let user = this.UsersService.delete(id);
-        if (!user)
-            throw new HttpException("not found", HttpStatus.NOT_FOUND);
-        return user;
+        @Param('id', ParseObjectIdPipe) id:string
+    ): Promise<User> {
+        return this.UsersService.delete(id)
     }
 }

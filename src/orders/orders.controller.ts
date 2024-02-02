@@ -1,63 +1,54 @@
-import { CreateOrderDto as Order, UpdateOrderDto } from './orders.dto';
+import { ParseObjectIdPipe } from 'src/common/pipes/parseObjectId.pipe';
+import { CreateOrderDto, UpdateOrderDto } from './schemas/orders.dto';
 import { OrdersService } from './orders.service';
+import { Order } from './schemas/order.schema';
 import {
     Controller, Param, Body,
     Get, Post, Patch, Delete,
-    HttpException, HttpStatus,
-    ParseUUIDPipe
 } from '@nestjs/common';
 
-@Controller('users/:userId/orders')
+@Controller('users/:user_id/orders')
 export class OrdersController
 {
     constructor(private readonly OrdersService: OrdersService) {}
 
     @Get()
     retrieveAll(
-        @Param('userId', ParseUUIDPipe) userId:string
-    ): Order[] {
-        return this.OrdersService.getAll(userId);
+        @Param('user_id', ParseObjectIdPipe) user_id:string
+    ): Promise<Order[]> {
+        return this.OrdersService.getAll(user_id);
     }
 
-    @Get(':orderId')
+    @Get(':order_id')
     retrieveOrder(
-        @Param('userId', ParseUUIDPipe) userId:string,
-        @Param('orderId', ParseUUIDPipe) orderId:string
-    ): Order {
-        let order = this.OrdersService.getOne(userId, orderId);
-        if (!order)
-            throw new HttpException("not found", HttpStatus.NOT_FOUND);
-        return order;
+        @Param('user_id', ParseObjectIdPipe) user_id:string,
+        @Param('order_id', ParseObjectIdPipe) order_id:string
+    ): Promise<Order> {
+        return this.OrdersService.getOne(user_id, order_id);
     }
 
     @Post()
     createOrder(
-        @Param('userId', ParseUUIDPipe) userId:string,
-        @Body() data:Order
-    ): Order {
-        return this.OrdersService.createOrder(userId, data);
+        @Param('user_id', ParseObjectIdPipe) user_id:string,
+        @Body() data: CreateOrderDto
+    ): Promise<Order> {
+        return this.OrdersService.createOrder(user_id, data);
     }
 
-    @Patch(':orderId')
+    @Patch(':order_id')
     updateOrder(
-        @Param('userId', ParseUUIDPipe) userId:string,
-        @Param('orderId', ParseUUIDPipe) orderId:string,
+        @Param('user_id', ParseObjectIdPipe) user_id:string,
+        @Param('order_id', ParseObjectIdPipe) order_id:string,
         @Body() data:UpdateOrderDto,
-    ): Order {
-        let order = this.OrdersService.updateOrder(userId, orderId, data);
-        if (!order)
-            throw new HttpException("not found", HttpStatus.NOT_FOUND);
-        return order;
+    ): Promise<Order> {
+        return this.OrdersService.updateOrder(user_id, order_id, data);
     }
 
-    @Delete(':orderId')
+    @Delete(':order_id')
     deleteOrder(
-        @Param('userId', ParseUUIDPipe) userId:string,
-        @Param('orderId', ParseUUIDPipe) orderId:string,
-    ): Order {
-        let order = this.OrdersService.deleteOrder(userId, orderId);
-        if (!order)
-            throw new HttpException("not found", HttpStatus.NOT_FOUND);
-        return order;
+        @Param('user_id', ParseObjectIdPipe) user_id:string,
+        @Param('order_id', ParseObjectIdPipe) order_id:string,
+    ): Promise<Order> {
+        return this.OrdersService.deleteOrder(user_id, order_id);
     }
 }

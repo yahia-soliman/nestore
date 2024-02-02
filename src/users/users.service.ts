@@ -1,40 +1,30 @@
+import { Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
-import { randomUUID } from 'crypto';
-import { UpdateUserDto, CreateUserDto as User } from './users.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { User } from './schemas/user.schema';
+import { UpdateUserDto, CreateUserDto } from './schemas/users.dto';
 
 @Injectable()
 export class UsersService
 {
-    users: User[] = [];
+    constructor(@InjectModel(User.name) private userModel: Model<User>){}
 
-    getAll(): User[] { return this.users }
+    getAll(): Promise<User[]> { return this.userModel.find() }
 
-    getOne(userId: string): User {
-        return this.users.find( (user) => userId === user.userId );
+    getOne(id: string): Promise<User> {
+        return this.userModel.findById(id)
     }
 
-    create(userData: User): User {
-        userData.userId = randomUUID();
-        userData.createdAt = new Date().toISOString();
-        this.users.push(userData);
-        return userData;
+    create(userData: CreateUserDto): Promise<User> {
+        userData.created_at = new Date().toISOString();
+        return this.userModel.create(userData);
     }
 
-    update(userId: string, data: UpdateUserDto): User {
-        let idx = this.users.findIndex(
-            (user) => user.userId === userId
-        );
-        if (idx < 0) return;
-
-        this.users[idx] = { ...this.users[idx], ...data };
-        return this.users[idx];
+    update(id: string, data: UpdateUserDto): Promise<User> {
+        return this.userModel.findByIdAndUpdate(id, data);
     }
 
-    delete(userId: string): User {
-        let idx = this.users.findIndex(
-            (user) => userId === user.userId
-        );
-        if (idx < 0) return;
-        return this.users.splice(idx, 1)[0];
+    delete(id: string): Promise<User> {
+        return this.userModel.findByIdAndDelete(id);
     }
 }

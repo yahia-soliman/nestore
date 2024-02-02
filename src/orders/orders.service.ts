@@ -1,44 +1,35 @@
 import { Injectable } from '@nestjs/common';
-import { randomUUID } from 'crypto';
-import { UpdateOrderDto, CreateOrderDto as Order } from './orders.dto';
+import { UpdateOrderDto, CreateOrderDto } from './schemas/orders.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Order } from './schemas/order.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class OrdersService {
-    orders: Order[] = [];
 
-    getAll(userId: string): Order[] {
-        return this.orders.filter( (order) => userId === order.userId );
+    constructor(@InjectModel(Order.name) private orderModel: Model<Order>){}
+
+    getAll(user_id: string): Promise<Order[]> {
+        return this.orderModel.find({user_id});
     }
 
-    getOne(userId: string, orderId: string): Order {
-        return this.orders.find(
-            (order) => userId === order.userId && orderId === order.orderId
-        );
+    getOne(user_id: string, order_id: string): Promise<Order> {
+        return this.orderModel.findOne({_id: order_id, user_id });
     }
 
-    createOrder(userId: string, orderData: Order): Order {
-        orderData.userId = userId;
-        orderData.orderId = randomUUID();
-        orderData.createdAt = new Date().toISOString();
-        this.orders.push(orderData);
-        return orderData;
+    createOrder(user_id: string, orderData: CreateOrderDto): Promise<Order> {
+        orderData.created_at = new Date().toISOString();
+        return this.orderModel.create({...orderData, user_id});
     }
 
-    updateOrder(userId: string, orderId: string, data: UpdateOrderDto): Order {
-        let idx = this.orders.findIndex(
-            (order) => order.userId === userId && order.orderId === orderId
-        );
-        if (idx < 0) return;
-
-        this.orders[idx] = { ...this.orders[idx], ...data, userId, orderId };
-        return this.orders[idx];
+    updateOrder(
+        user_id: string, order_id: string, updates: UpdateOrderDto
+    ): Promise<Order> {
+        return this.orderModel
+            .findOneAndUpdate( { _id: order_id, user_id }, updates);
     }
 
-    deleteOrder(userId: string, orderId: string): Order {
-        let idx = this.orders.findIndex(
-            (order) => userId === order.userId && orderId === order.orderId
-        );
-        if (idx < 0) return;
-        return this.orders.splice(idx, 1)[0];
+    deleteOrder(user_id: string, order_id: string): Promise<Order> {
+        return this.orderModel.findOneAndDelete({_id: order_id, user_id});
     }
 }
