@@ -1,7 +1,10 @@
 import { CreateUserDto, UpdateUserDto } from 'src/users/schemas/users.dto';
-import { Controller, Post, Body, Get, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
+import {
+    Controller, Request, UseGuards,
+    Post, Get, Body
+} from '@nestjs/common';
 
 @Controller('auth')
 export class AuthController {

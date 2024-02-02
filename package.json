@@ -1,8 +1,8 @@
 {
-  "name": "lab",
-  "version": "0.0.1",
-  "description": "",
-  "author": "",
+  "name": "nestore",
+  "version": "0.1.0",
+  "description": "Application server for an e-commerce website",
+  "author": "Yahia Soliman",
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
