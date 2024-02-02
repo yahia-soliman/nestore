@@ -17,6 +17,9 @@ export class User
     })
     email: string
 
+    @Prop({ required: true, minlength: 60 })
+    password: string;
+
     @Prop({length:11})
     phone: string;
 

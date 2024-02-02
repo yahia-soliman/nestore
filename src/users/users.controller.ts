@@ -29,11 +29,7 @@ export class UsersController
         return this.UsersService.create(data)
             .catch(() => {
                 throw new BadRequestException(
-                    {
-                        "error": "Bad Request",
-                        "message": "this email is used by another user.",
-                        "statusCode": 400
-                    }
+                    "this email is used by another user"
                 )
             });
     }
@@ -46,11 +42,7 @@ export class UsersController
         return this.UsersService.update(id, data)
             .catch(() => {
                 throw new BadRequestException(
-                    {
-                        "error": "Bad Request",
-                        "message": "this email is used by another user.",
-                        "statusCode": 400
-                    }
+                    "this email is used by another user"
                 )
             });
     }

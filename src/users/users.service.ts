@@ -15,6 +15,10 @@ export class UsersService
         return this.userModel.findById(id)
     }
 
+    getOneByEmail(email: string): Promise<User> {
+        return this.userModel.findOne({email})
+    }
+
     create(userData: CreateUserDto): Promise<User> {
         userData.created_at = new Date().toISOString();
         return this.userModel.create(userData);

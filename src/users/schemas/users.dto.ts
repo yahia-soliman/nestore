@@ -2,7 +2,7 @@ import { PartialType } from "@nestjs/mapped-types";
 import {
     IsAlpha, IsDateString, IsNotEmpty, IsUUID,
     Length, IsNumber, IsPositive, IsEmail, IsOptional,
-    IsNumberString
+    IsNumberString, IsStrongPassword
 } from "class-validator";
 
 export class CreateUserDto {
@@ -15,6 +15,9 @@ export class CreateUserDto {
 
     @IsEmail()
     email: string;
+
+    @IsStrongPassword({ minLength: 8 })
+    password: string;
 
     @IsNumberString()
     @Length(11, 11, {message:"Phone number mush be exactly 11 characters"})
