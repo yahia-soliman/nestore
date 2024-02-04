@@ -6,8 +6,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import {
     Controller, Param, Body,
     Get, Post, Patch, Delete,
-    UseGuards,
-    Request,
+    UseGuards, Request,
 } from '@nestjs/common';
 
 @Controller('orders')
