@@ -5,12 +5,6 @@ import { isValidObjectId } from 'mongoose';
 export class ParseObjectIdPipe implements PipeTransform {
   transform(value: string) {
     if (isValidObjectId(value)) return value;
-    else throw new BadRequestException(
-      {
-        "message": `${value} is not a valid id`,
-        "error": "Bad Request",
-        "statusCode": 400
-      }
-    );
+    else throw new BadRequestException(`${value} is not a valid id`);
   }
 }

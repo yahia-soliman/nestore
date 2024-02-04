@@ -28,7 +28,8 @@ export class AuthService {
         if (!ok) throw new ForbiddenException("wrong email or password");
         return {
             token: this.jwtService.sign(
-                { email }, { secret: process.env.JWTSEC, expiresIn: '1h' }
+                { email, user_id: user._id },
+                { secret: process.env.JWTSEC, expiresIn: '1h' }
             )
         }
     }
